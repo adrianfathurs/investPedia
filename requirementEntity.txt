@@ -1,0 +1,42 @@
+Entity:
+- User
+column:
+	id: int
+	full_name: varchar
+	avatar: varchar
+	occupation: varchar
+	email: varchar
+	password(hash): varchar
+	role: varchar
+	token: varchar
+	created_at: datetime
+	updated_at: datetime
+-campaigns:
+	id: int
+	title: varchar
+	sub_title: varchar
+	description: varchar
+	target_invest(int): int
+	current_invest(int)
+	perks: text
+	slug: varchar
+	backer_count: int
+	user_id(fk)
+	created_at: datetime
+	updated_at: datetime
+-campaign_images:
+	id: int
+	file_name: varchar
+	isPrimary: boolean(tinyint)
+	campaign_id(fk)
+	created_at: datetime
+	updated_at: datetime
+-transactions
+	id_transaction
+	user_id(fk)
+	campaing_id(fk)
+	amount: int
+	transaction_status: varchar
+	code: varchar
+	created_at: datetime
+	update_at: datetime
