@@ -29,7 +29,6 @@ func (s *service) RegisterUser(input RegisterUserInput) (User, error) {
 	user.Role = "user"
 
 	status, err := s.repository.Save(user)
-
 	if err != nil {
 		return user, err
 	}
