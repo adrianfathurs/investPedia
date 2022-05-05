@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 )
 
 type userHandler struct {
@@ -22,10 +21,7 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
-		var errors []string
-		for _, e := range err.(validator.ValidationErrors) {
-			errors = append(errors, e.Error())
-		}
+		errors := helper.FormatValidationError(err)
 		errorMessage := gin.H{"errors": errors}
 		response := helper.APIResponse("Input is not valid", "failed", http.StatusUnprocessableEntity, errorMessage)
 		c.JSON(http.StatusUnprocessableEntity, response)
@@ -43,4 +39,34 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 
 	response := helper.APIResponse("Account has been registered", "success", http.StatusOK, formatter)
 	c.JSON(http.StatusOK, response)
+}
+
+func (h *userHandler) Login(c *gin.Context) {
+	var input user.LoginInput
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.APIResponse("Login failed, Input is not valid", "failed", http.StatusUnprocessableEntity, errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+	loggedinUser, err := h.userService.Login(input)
+
+	if err != nil {
+		errorMessage := gin.H{"errors": err.Error()}
+		response := helper.APIResponse("Login failed, Input is not valid", "failed", http.StatusUnprocessableEntity, errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+	formatter := user.FormatterUserResponse(loggedinUser, "")
+
+	response := helper.APIResponse("Login Success", "success", http.StatusOK, formatter)
+	c.JSON(http.StatusOK, response)
+	// user memasukan email dan password
+	// input ditangkap handler
+	// mapping login struct terhadap input
+	// di service akan mencari dalam bantuan repository user dengan email x
+	// kalo ketemu mencocokan password
 }
