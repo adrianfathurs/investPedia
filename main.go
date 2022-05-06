@@ -1,11 +1,14 @@
 package main
 
 import (
+	"investPedia/auth"
 	"investPedia/handler"
 	"investPedia/user"
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -18,9 +21,17 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
+	err = godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+	// getting env variables SITE_TITLE and DB_HOST
+	secretKeyJWT := os.Getenv("SECRET_KEY_JWT")
+
 	userRepository := user.NewRepository(db)
 	userService := user.NewService(userRepository)
-	userHandler := handler.NewUserHandler(userService)
+	authService := auth.NewService(secretKeyJWT)
+	userHandler := handler.NewUserHandler(userService, authService)
 
 	router := gin.Default()
 	api := router.Group("/api/v1")
