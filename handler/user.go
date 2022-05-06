@@ -108,5 +108,36 @@ func (h *userHandler) CheckEmailAvailibility(c *gin.Context) {
 	// struct input di passing pada service
 	// service laporan pada repository
 	// repository akan melakukan pengecekan di dalam db
+}
+
+func (h *userHandler) UploadAvatar(c *gin.Context) {
+	file, err := c.FormFile("avatar")
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.APIResponse("Failed Upload File", "failed", http.StatusBadRequest, data)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	filePath := "images/" + file.Filename
+	err = c.SaveUploadedFile(file, filePath)
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.APIResponse("Request timeout, Failed Upload File", "failed", http.StatusRequestTimeout, data)
+		c.JSON(http.StatusRequestTimeout, response)
+		return
+	}
+
+	userID := 1
+	_, err = h.userService.SaveAvatar(userID, filePath)
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.APIResponse("Request timeout, Failed Upload File", "failed", http.StatusRequestTimeout, data)
+		c.JSON(http.StatusRequestTimeout, response)
+		return
+	}
+	data := gin.H{"is_uploaded": true}
+	response := helper.APIResponse("Avatar is uploaded", "success", http.StatusOK, data)
+	c.JSON(http.StatusOK, response)
 
 }
