@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"investPedia/auth"
+	"investPedia/campaign"
 	"investPedia/handler"
 	"investPedia/helper"
 	"investPedia/user"
@@ -33,8 +35,12 @@ func main() {
 	secretKeyJWT := os.Getenv("SECRET_KEY_JWT")
 
 	userRepository := user.NewRepository(db)
+	campaignRepository := campaign.NewRepository(db)
 	userService := user.NewService(userRepository)
 	authService := auth.NewService(secretKeyJWT)
+	campaignService := campaign.NewService(campaignRepository)
+	findCampaign, err := campaignService.FindCampaigns(8)
+	fmt.Println(findCampaign)
 	userHandler := handler.NewUserHandler(userService, authService)
 
 	router := gin.Default()
@@ -56,6 +62,7 @@ func authMiddleware(authService auth.Service, userService user.Service) gin.Hand
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
+
 		tokenString := ""
 		arrayToken := strings.Split(authHeader, " ")
 		if len(arrayToken) == 2 {
@@ -87,3 +94,20 @@ func authMiddleware(authService auth.Service, userService user.Service) gin.Hand
 		c.Set("currentUser", user)
 	}
 }
+
+// Campaign for all user
+/*
+	1. show six display campaign on landing
+	2. show all campaign
+	3. show one campaign with benefit and people who is responsibility
+*/
+
+// Campaign fo on user
+/*
+1. create campaign
+2. show detail campaign
+3. edit campaign
+4. can upload galery when we enter on detail campaign
+5. show transaction they have with date
+
+*/
