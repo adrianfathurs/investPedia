@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"investPedia/auth"
 	"investPedia/campaign"
 	"investPedia/handler"
@@ -36,12 +35,13 @@ func main() {
 
 	userRepository := user.NewRepository(db)
 	campaignRepository := campaign.NewRepository(db)
+
 	userService := user.NewService(userRepository)
 	authService := auth.NewService(secretKeyJWT)
 	campaignService := campaign.NewService(campaignRepository)
-	findCampaign, err := campaignService.FindCampaigns(8)
-	fmt.Println(findCampaign)
+
 	userHandler := handler.NewUserHandler(userService, authService)
+	campaignHandler := handler.NewCampaignHandler(campaignService)
 
 	router := gin.Default()
 	api := router.Group("/api/v1")
@@ -49,6 +49,7 @@ func main() {
 	api.POST("/login", userHandler.Login)
 	api.POST("/checkEmail", userHandler.CheckEmailAvailibility)
 	api.POST("/uploadAvatar", authMiddleware(authService, userService), userHandler.UploadAvatar)
+	api.GET("/campaigns", campaignHandler.GetCampaigns)
 	router.Run()
 
 }
