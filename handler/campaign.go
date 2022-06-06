@@ -3,6 +3,7 @@ package handler
 import (
 	"investPedia/campaign"
 	"investPedia/helper"
+	"investPedia/user"
 	"net/http"
 	"strconv"
 
@@ -15,6 +16,27 @@ type campaignHandler struct {
 
 func NewCampaignHandler(service campaign.Service) *campaignHandler {
 	return &campaignHandler{service}
+}
+
+func (h *campaignHandler) CreateCampaign(c *gin.Context) {
+	var input campaign.CreateCampaignInput
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		response := helper.APIResponse("Invalid Input", "failed", http.StatusBadRequest, nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	currentUser := c.MustGet("currentUser").(user.User)
+	input.User = currentUser
+	newCampaign, err := h.service.CreateCampaign(input)
+	if err != nil {
+		response := helper.APIResponse("Invalid Input", "failed", http.StatusBadRequest, nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	response := helper.APIResponse("Success to create campaign", "statusOK", http.StatusOK, campaign.FormatCampaign(newCampaign))
+	c.JSON(http.StatusOK, response)
+
 }
 
 func (h *campaignHandler) GetCampaigns(c *gin.Context) {
@@ -47,7 +69,7 @@ func (h *campaignHandler) GetCampaign(c *gin.Context) {
 		return
 	}
 	formatCampaignDetail := campaign.FormatCampaignDetail(campaignDetail)
-	response := helper.APIResponse("Invalid Input", "Failed", http.StatusOK, formatCampaignDetail)
+	response := helper.APIResponse("OK", "success", http.StatusOK, formatCampaignDetail)
 	c.JSON(http.StatusOK, response)
 	return
 }
