@@ -1,7 +1,6 @@
 package campaign
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -96,7 +95,6 @@ func FormatCampaignDetail(campaign Campaign) CampaignDetailFormatter {
 	var campaignImages []CampaignImagesFormatter
 	if len(campaign.CampaignImages) > 0 {
 		for _, item := range campaign.CampaignImages {
-			fmt.Println(item.IsPrimary, "iini coba")
 			formatterImage := FormatCampaignImages(item)
 			campaignImages = append(campaignImages, formatterImage)
 		}
