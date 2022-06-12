@@ -3,7 +3,8 @@ package campaign
 import "gorm.io/gorm"
 
 type Repository interface {
-	Save(Campaign Campaign) (Campaign, error)
+	Save(campaign Campaign) (Campaign, error)
+	Update(campaign Campaign) (Campaign, error)
 	FindAllCampaign() ([]Campaign, error)
 	FindCampaignByUserID(userID int) ([]Campaign, error)
 	FindCampaignByID(ID int) (Campaign, error)
@@ -23,6 +24,14 @@ func (r *repository) Save(campaign Campaign) (Campaign, error) {
 		return campaign, err
 	}
 	return campaign, nil
+}
+
+func (r *repository) Update(campaign Campaign) (Campaign, error) {
+	err := r.db.Save(&campaign).Error
+	if err != nil {
+		return campaign, err
+	}
+	return campaign, err
 }
 
 func (r *repository) FindAllCampaign() ([]Campaign, error) {
