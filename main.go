@@ -55,8 +55,8 @@ func main() {
 	api.GET("/campaigns", campaignHandler.GetCampaigns)
 	api.GET("/campaign/:id", campaignHandler.GetCampaign)
 	api.PUT("/updateCampaign/:id", authMiddleware(authService, userService), campaignHandler.UpdateCampaign)
+	api.POST("/campaign-images", authMiddleware(authService, userService), campaignHandler.UploadCampaignImage)
 	router.Run()
-
 }
 
 // create middleware
