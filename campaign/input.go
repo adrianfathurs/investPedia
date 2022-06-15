@@ -3,7 +3,7 @@ package campaign
 import "investPedia/user"
 
 type CampaignInput struct {
-	ID int `uri:"id" binding:"required`
+	ID int `uri:"id" binding:"required"`
 }
 
 type CreateCampaignInput struct {
