@@ -5,6 +5,7 @@ import (
 	"investPedia/campaign"
 	"investPedia/handler"
 	"investPedia/helper"
+	"investPedia/transaction"
 	"investPedia/user"
 	"log"
 	"net/http"
@@ -35,27 +36,33 @@ func main() {
 
 	userRepository := user.NewRepository(db)
 	campaignRepository := campaign.NewRepository(db)
-
+	transactionRepository := transaction.NewRepository(db)
 	userService := user.NewService(userRepository)
 	authService := auth.NewService(secretKeyJWT)
 	campaignService := campaign.NewService(campaignRepository)
+	transactionService := transaction.NewService(transactionRepository, campaignRepository)
 
 	userHandler := handler.NewUserHandler(userService, authService)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
+	transactionHandler := handler.NewTransactionHandler(transactionService)
 
 	router := gin.Default()
 	router.Static("/images", "./images")
 
 	api := router.Group("/api/v1")
+
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/login", userHandler.Login)
 	api.POST("/checkEmail", userHandler.CheckEmailAvailibility)
 	api.POST("/uploadAvatar", authMiddleware(authService, userService), userHandler.UploadAvatar)
+
 	api.POST("/campaigns", authMiddleware(authService, userService), campaignHandler.CreateCampaign)
 	api.GET("/campaigns", campaignHandler.GetCampaigns)
 	api.GET("/campaign/:id", campaignHandler.GetCampaign)
 	api.PUT("/updateCampaign/:id", authMiddleware(authService, userService), campaignHandler.UpdateCampaign)
 	api.POST("/campaign-images", authMiddleware(authService, userService), campaignHandler.UploadCampaignImage)
+
+	api.GET("/campaigns/:id/transactions", authMiddleware(authService, userService), transactionHandler.GetTransactionsByCampaignID)
 	router.Run()
 }
 
