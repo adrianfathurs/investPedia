@@ -1,8 +1,11 @@
 package transaction
 
-import "time"
+import (
+	"investPedia/user"
+	"time"
+)
 
-type transaction struct {
+type Transaction struct {
 	ID                int
 	Amount            int
 	UserId            int
@@ -10,4 +13,5 @@ type transaction struct {
 	Code              string
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
+	User              user.User
 }
