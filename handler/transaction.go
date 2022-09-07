@@ -55,3 +55,29 @@ func (h *TransactionHandler) GetTransactionsByUserID(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 	return
 }
+
+func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
+	var input transaction.CreateTransactionInput
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+		response := helper.APIResponse("Invalid Input", "failed", http.StatusBadRequest, errorMessage)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	currentUser := c.MustGet("currentUser").(user.User)
+	input.User = currentUser
+	newTransaction, err := h.service.CreateTransactionInput(input)
+	if err != nil {
+		response := helper.APIResponse("Failed to post transacations", "Failed", http.StatusBadRequest, nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	// newTransaction.Code = "200"
+	response := helper.APIResponse("Successfully to post transactions", "Success", http.StatusOK, transaction.FormatTransaction(newTransaction))
+	c.JSON(http.StatusOK, response)
+	return
+
+}
