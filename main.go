@@ -5,6 +5,7 @@ import (
 	"investPedia/campaign"
 	"investPedia/handler"
 	"investPedia/helper"
+	"investPedia/payment"
 	"investPedia/transaction"
 	"investPedia/user"
 	"log"
@@ -40,7 +41,8 @@ func main() {
 	userService := user.NewService(userRepository)
 	authService := auth.NewService(secretKeyJWT)
 	campaignService := campaign.NewService(campaignRepository)
-	transactionService := transaction.NewService(transactionRepository, campaignRepository)
+	paymentService := payment.NewService()
+	transactionService := transaction.NewService(transactionRepository, campaignRepository, paymentService)
 
 	userHandler := handler.NewUserHandler(userService, authService)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
@@ -64,6 +66,7 @@ func main() {
 
 	api.GET("/campaigns/:id/transactions", authMiddleware(authService, userService), transactionHandler.GetTransactionsByCampaignID)
 	api.GET("/transactions", authMiddleware(authService, userService), transactionHandler.GetTransactionsByUserID)
+	api.POST("/transactions", authMiddleware(authService, userService), transactionHandler.CreateTransaction)
 	router.Run()
 }
 
